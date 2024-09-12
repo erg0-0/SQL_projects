@@ -1,18 +1,14 @@
 with  manual_country_info as
 	( 
-	SELECT --110
+	SELECT 
 	country
 	,country_name
 	,cluster
 	,is_gem_ship_to_country
 	,is_affiliate__ship_to_county
 	FROM adl_business_gem_cf_supply_chain.GEM_supply_chain_clusters
-	--WHERE
-	--(is_gem_ship_to_country = 'true' OR country IN ('CN', 'JP', 'UY') --)
-	--AND country NOT IN ('IR', 'SY', 'SD' )
 	)
-,cust AS  --ADDING CUSTOMER MASTER DATA
-    	    (select distinct --1,936,646
+,cust AS  (select distinct 
     	    cust.sap_commercial_account_id
     	    ,cust.sap_commercial_account_name 
     	    ,cust.country
@@ -60,8 +56,8 @@ with  manual_country_info as
 	WHERE 
 	calendar_year >= year(current_date)-2
 	AND sales_document_type IN ('Z8FA', 'Z8C1', 'Z8F2')
-	AND  sales_organization IN ('CH10', 'PA10') --company code Only Alcon Pharmaceuticals LTD & Alcon Panama
-	and plant NOT IN ('CH06')  --'CH10','PA01', 
+	AND  sales_organization IN ('CH10', 'PA10') 
+	and plant NOT IN ('CH06') 
 	AND order_type <> 'WEB' 
 	AND distribution_channel = 'TR' 
 	)

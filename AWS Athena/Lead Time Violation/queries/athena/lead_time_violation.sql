@@ -1,25 +1,24 @@
 WITH manual_country_info as
-                ( 
-                SELECT --110
-                country
-                ,country_name
-                ,cluster
-                ,is_gem_ship_to_country
-                ,is_affiliate__ship_to_county
-                FROM adl_business_gem_cf_supply_chain.GEM_supply_chain_clusters
-                WHERE
-                (is_gem_ship_to_country = 'true' OR country IN ('CN', 'JP', 'UY') )
-                 AND country NOT IN ('IR', 'SY', 'SD' )
-                 )
-, cust AS  --ADDING CUSTOMER MASTER DATA
-    	    (select distinct --1,936,646
-    	    cust.sap_commercial_account_id
-    	    ,cust.sap_commercial_account_name 
-    	    ,cust.country
-    	   from "adl_enriched_gbl_cf_reference"."dim_customer" cust
-    	   )
+  ( 
+    SELECT
+    country
+    ,country_name
+    ,cluster
+    ,is_gem_ship_to_country
+    ,is_affiliate__ship_to_county
+    FROM adl_business_gem_cf_supply_chain.GEM_supply_chain_clusters
+    WHERE
+     (is_gem_ship_to_country = 'true' OR country IN ('CN', 'JP', 'UY') )
+      AND country NOT IN ('IR', 'SY', 'SD' )
+  )
+, cust AS 
+  (select distinct --1,936,646
+    cust.sap_commercial_account_id
+    ,cust.sap_commercial_account_name 
+    ,cust.country
+    from "adl_enriched_gbl_cf_reference"."dim_customer" cust
+  )
 ,brand as 
-	    --ADDING BRAND AND SUBFRANCHISE INFORMATION
 	   ( SELECT 
         material_code
         , product_level2_description as "franchise"
@@ -35,10 +34,10 @@ WITH manual_country_info as
          ,ship_to_customer_nbr
          ,created_by
          ,created_date
-         ,header_created_by          --,EXTRACT (year from created_date) as "created_date_year"          --,EXTRACT ( month from created_date ) as "created_date_month"
+         ,header_created_by         
          ,date_parse( CONCAT(cast(created_date as varchar),' ', created_time), '%Y-%m-%d %H:%i:%s') as created_timestamp
-         ,item_category_id          --,item_category_description
-         ,sales_document_type          --,sold_to_customer_nbr          --,reason_rejection
+         ,item_category_id    
+         ,sales_document_type  
          ,sales_organization
          ,original_vendor
          ,plant
@@ -55,9 +54,9 @@ WITH manual_country_info as
         WHERE 
         calendar_year >= year(current_date)-1
         and reason_rejection is NULL
-        AND sales_document_type IN ('Z8FA')--, 'Z8C1', 'Z8F2')
-        AND  sales_organization IN ('CH10', 'PA10') --company code Only Alcon Pharmaceuticals LTD & Alcon Panama
-        and plant NOT IN ('CH06')  --plant NOT IN ('CH10','PA01', 'CH06') 
+        AND sales_document_type IN ('Z8FA')
+        AND  sales_organization IN ('CH10', 'PA10')
+        and plant NOT IN ('CH06')
         AND order_type <> 'WEB' 
         AND distribution_channel = 'TR'
 )
@@ -68,10 +67,10 @@ WITH manual_country_info as
     SELECT 
     CONCAT(s.sales_document_number,s.material_code ) as "primarykey_foresight_so_mat"
     ,s.sales_document_number
-    , s.sales_document_item --
-    , s.material_code --    , s."created_date_year", --    , s."created_date_month"
+    , s.sales_document_item
+    , s.material_code
     ,s.created_timestamp
-    ,s.sales_organization --    ,s.reason_rejection
+    ,s.sales_organization
     ,s.original_vendor
     ,s.plant
     ,s.shipping_condition
@@ -86,7 +85,7 @@ WITH manual_country_info as
       ELSE 'CSR'  END "created_by_bot_csr"
     ,pmt_text."payment_terms_text"
     ,cust.country as "ship_to_customer_country"
-    ,cust.sap_commercial_account_name as "customer_name"--,cust2.sap_commercial_account_name "sold_to_customer_name"
+    ,cust.sap_commercial_account_name as "customer_name"
     ,m.cluster
     ,m.country_name
     ,m.is_affiliate__ship_to_county
