@@ -115,7 +115,7 @@ INNER JOIN cust ON m."country" = cust.country
 INNER JOIN billing_data b on b.ship_to_customer_nbr = cust.sap_commercial_account_id
 INNER JOIN sales s on s.sales_document_number = b.sales_document_number  and s.material_code = b.material_code 
 INNER JOIN delivery d on s.sales_document_number = d.delivery_sales_document and s.material_code = d.material 
-LEFT JOIN brand  on brand.material_code = s.material_code
+LEFT JOIN brand  on brand.material_code = b.material_code
 WHERE d.delivery_actual_goods_issue_date IS NOT NULL
 )
 , median as (

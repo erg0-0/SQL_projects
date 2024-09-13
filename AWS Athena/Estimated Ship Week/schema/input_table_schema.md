@@ -4,77 +4,122 @@ This document outlines the structure of the tables used in the SQL queries provi
 
 ---
 
-## 1. **Table: `customer_data`**
+## 1. **Table: `adl_business_gem_cf_supply_chain.gem_supply_chain_clusters`**
 
-This table contains demographic and transactional data for customers.
+This table contains country mapping information for GEM region.
 
 | Column Name       | Data Type    | Description                                    |
 |-------------------|--------------|------------------------------------------------|
-| `customer_id`     | INT          | Unique identifier for each customer            |
-| `first_name`      | VARCHAR(100) | Customer's first name                          |
-| `last_name`       | VARCHAR(100) | Customer's last name                           |
-| `email`           | VARCHAR(255) | Email address of the customer                  |
-| `signup_date`     | DATE         | The date the customer signed up                |
-| `last_purchase`   | DATE         | The date of the customer's most recent purchase|
-| `total_spend`     | DECIMAL(10,2)| Total amount spent by the customer             |
+| `country`     | string          | Unique country code ISO-2            |
+| `country_name`      | string | Country name                 |
+| `cluster`       | string | countries grouped into clusters                         |
+| `is_gem_ship_to_country`           | string | identifier of GEM ship to country                |
+| `is_affiliate__ship_to_country`     | string| identifier for affiliate status            |
+| `is_european_union`   | string  |  indicator for EU membership                   |
 
 ---
 
-## 2. **Table: `sales_transactions`**
+## 2. **Table: `adl_enriched_gbl_cf_reference.dim_customer`**
 
-This table tracks individual sales transactions for each customer.
+This table tracks information about each customer.
 
 | Column Name        | Data Type     | Description                                  |
 |--------------------|---------------|----------------------------------------------|
-| `transaction_id`   | INT           | Unique identifier for each transaction       |
-| `customer_id`      | INT           | Foreign key referring to `customer_data`     |
-| `transaction_date` | DATE          | The date the transaction occurred            |
-| `transaction_amount`| DECIMAL(10,2) | The monetary value of the transaction        |
-| `product_id`       | INT           | Identifier for the product being purchased   |
+| `sap_commercial_account`   | string           | Unique identifier for each customer       |
+| `sap_commercial_account_name`      | string           | Customers Name    |
+| `country` | varchar(2)          | Foreign Key to gem_supply_chain_clusters.country         |
 
----
 
-## 3. **Table: `product_catalog`**
+## 3. **Table: `"adl_enriched_gbl_cf_sapbods"."fact_sales_billing"`**
 
-This table contains information about the products available for sale.
+This table tracks information about each customer.
 
 | Column Name        | Data Type     | Description                                  |
 |--------------------|---------------|----------------------------------------------|
-| `product_id`       | INT           | Unique identifier for each product           |
-| `product_name`     | VARCHAR(255)  | Name of the product                          |
-| `category`         | VARCHAR(100)  | Product category (e.g., Electronics, Apparel)|
-| `price`            | DECIMAL(10,2) | Unit price of the product                    |
+| `sales_document_number`   | string           | Unique identifier for each sales document       |
+| `billing_document_number`      | string           | billing document number   |
+| `bill_date` | date         | billing date        |
+| `ship_to_customer_nbr` | string         | Ship To customer Number       |
+| `billing_type` | string          | Billing Type         |
+| `material_code` | string       | Material Code       |
+| `item_category_id` | string         | Item Category ID         |
+| `item_category_description` | string      | Item Category Description       |
 
----
+## 4. **Table: `"adl_enriched_gbl_cf_sapbods"."fact_delivery_item"`**
 
-## 4. **Table: `inventory`**
-
-This table tracks the availability of products in stock.
-
-| Column Name        | Data Type     | Description                                  |
-|--------------------|---------------|----------------------------------------------|
-| `product_id`       | INT           | Foreign key referring to `product_catalog`   |
-| `warehouse_id`     | INT           | Identifier for the warehouse                 |
-| `stock_quantity`   | INT           | The quantity of the product in stock         |
-
----
-
-## 5. **Table: `warehouse`**
-
-This table contains information about the warehouses where products are stored.
+This table tracks information about each customer.
 
 | Column Name        | Data Type     | Description                                  |
 |--------------------|---------------|----------------------------------------------|
-| `warehouse_id`     | INT           | Unique identifier for each warehouse         |
-| `warehouse_name`   | VARCHAR(255)  | Name of the warehouse                        |
-| `location`         | VARCHAR(255)  | Location of the warehouse (city, state)      |
+| `refer_doc_number`   | string           | sales document  number Foreign Key     |
+| `delivery`      | string           | delivery document number   |
+| `actual_gi_date` | date         | actual goods issued date        |
+| `material` | string       | Material Code       |
+
+
+
+## 5. **Table: `"adl_enriched_gbl_cf_sapbods"."dim_material"`**
+
+This table tracks information about each material.
+
+| Column Name        | Data Type     | Description                                  |
+|--------------------|---------------|----------------------------------------------|
+| `material_code` | string   | Foreign Key to Material     |
+| `product_level2_description`   | string           | Franchise       |
+| `sub_franchise_id`      | string           | Sub-Franchise ID   |
+| `sub_franchise_description`      | string           | Sub-Franchise Name    |
+| `product_level5_description` | string   | Brand Name         |
+
 
 ---
 
-### Notes:
-- The `customer_data` table serves as the main reference for customer information.
-- Sales data is tracked in the `sales_transactions` table, which is linked to customers via the `customer_id`.
-- The `product_catalog` and `inventory` tables provide information about the products sold and their availability in different warehouses.
-- Where possible, foreign key relationships have been inferred from the query context.
+## 6. **Table: `"adl_enriched_gbl_cf_sapbods"."fact_sales_oti"`**
 
-If you need more details or have any additional questions regarding the table structures, please refer to the SQL query comments or the project documentation.
+This table contains information about the sales documents.
+
+| Column Name        | Data Type     | Description                                  |
+|--------------------|---------------|----------------------------------------------|
+| `sales_document_number`     | string           | Unique identifier for each sales document         |
+| `sales_document_type`   | string | Type of sales document              |
+| `created_date`         | date  | date of creation sales document |
+| `order_type`     | string           | Item Category ID      |
+| `sales_plant`   | string  | Sales Plant     |
+| `plant_description`   | string  | Plant Description     |
+| `sales_organization`     | string           | Sales Organization   |
+| `original_vendor`   | string| Original Vendor                        |
+| `purchase_order_number`   | string  |  purchase order number                       |
+| `shipping_condition`     | string         | Shipping Condition       |
+| `payment_terms`     | string         | Payment Terms      |
+| `customer purchase_order_number`   | string  |  Customer purchase order number                       |
+| `material_code`         | string  | Material Code    |
+| `sales_document_item`     | string           | Sales Document Item         |
+| `ship_to_customer_nbr`         | string |unique identifier to Ship to Customer Number     |
+| `distribution_channel`         | string | Distribution Channel     |
+
+## 7. **Table: `"adl_business_gem_cf_supply_chain"."weekly_cesw"`**
+
+This table contains information about the OSLs.
+
+| Column Name        | Data Type     | Description                                  |
+|--------------------|---------------|----------------------------------------------|
+| `sales_order_no`     | string           | Unique identifier for each sales document         |
+| `material`   | string | material code             |
+| `delivery_number`         | date  | date of delivery |
+| `propose_estimated_ship_week__date_format`     | date           | Proposed estimated ship week     |
+| `estimated_ship_week_date_format_cs`     | date           | Estimated Ship Week   |
+| `osl_file_date`   | date| Load Date of the OSL file                      |
+
+
+## 8. **Table: `adl_enriched_gbl_cf_sapbods.fact_delivery_item`**
+
+This table tracks the deliveries.
+
+| Column Name        | Data Type     | Description                                  |
+|--------------------|---------------|----------------------------------------------|
+| `refer_doc_number`       | string           | Foreign key referring to `product_catalog`   |
+| `delivery`     | string           | Delivery number               |
+| `actual_gi_date`   | date           | actual goods issued date        |
+| `material`   | string           | material code         |
+
+
+
